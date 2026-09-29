@@ -101,17 +101,16 @@ curl -s -A GPTBot "{curl_base}/llms.txt" | head -5"""
     <tr>
       <td>Perplexity</td>
       <td>
-        <p><strong>If onrender.com fetch fails</strong> (cold start or tool blocks Render), use GitHub raw mirror:</p>
-        <pre style="white-space:pre-wrap;margin:0.5rem 0">Fetch these URLs and list titles, locations, apply URLs:
-1) https://raw.githubusercontent.com/dzmitrypysk-ctrl/epam-ai-vacancies/main/static-mirror/llms.txt
-2) https://raw.githubusercontent.com/dzmitrypysk-ctrl/epam-ai-vacancies/main/static-mirror/jobs-java-poland.json</pre>
-        <p>Live API (warm service first — open {_esc(curl_base)}/health ):</p>
-        <pre style="white-space:pre-wrap;margin:0.5rem 0">Use only this machine-readable job API (do not fall back to careers.epam.com):
-1) GET {_esc(curl_base)}/llms.txt
-2) Then GET {_esc(curl_base)}/jobs?q=java&amp;country=Poland&amp;limit=5
-List titles, locations, and apply URLs from the JSON results.</pre>
+        <p><strong>Limitation:</strong> Perplexity often does <em>not</em> live-HTTP-fetch arbitrary URLs.
+        &quot;Failed to fetch content&quot; with no status code usually means the URL is absent from their crawl index
+        (same for onrender, raw.githubusercontent, jsDelivr). Prefer ChatGPT Actions or paste JSON below.</p>
+        <p>Workaround — attach/paste sample, or try jsDelivr (rarely helps):</p>
+        <pre style="white-space:pre-wrap;margin:0.5rem 0">https://cdn.jsdelivr.net/gh/dzmitrypysk-ctrl/epam-ai-vacancies@main/static-mirror/jobs-java-poland.json
+https://gist.github.com/dzmitrypysk-ctrl/2e05b9ed5b86020a35f05995c0d4896d</pre>
+        <p>Live API (only if their tool truly fetches; warm {_esc(curl_base)}/health first):</p>
+        <pre style="white-space:pre-wrap;margin:0.5rem 0">GET {_esc(curl_base)}/jobs?q=java&amp;country=Poland&amp;limit=5</pre>
       </td>
-      <td><code>perplexitybot</code> on /llms.txt+/jobs (GitHub raw will not show in /stats)</td>
+      <td>Usually no hit in /stats — expected</td>
     </tr>
     <tr>
       <td>ChatGPT</td>

@@ -1,0 +1,7 @@
+Live (Render): https://epam-ai-vacancies.onrender.com/llms.txt
+GitHub raw: https://raw.githubusercontent.com/dzmitrypysk-ctrl/epam-ai-vacancies/main/static-mirror/llms.txt
+jsDelivr: https://cdn.jsdelivr.net/gh/dzmitrypysk-ctrl/epam-ai-vacancies@main/static-mirror/llms.txt
+jsDelivr JSON: https://cdn.jsdelivr.net/gh/dzmitrypysk-ctrl/epam-ai-vacancies@main/static-mirror/jobs-java-poland.json
+Gist: - Creating gist with multiple files
+✓ Created public gist jobs-java-poland.json
+https://gist.github.com/dzmitrypysk-ctrl/2e05b9ed5b86020a35f05995c0d4896d
