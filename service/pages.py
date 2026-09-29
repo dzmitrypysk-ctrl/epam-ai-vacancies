@@ -100,8 +100,13 @@ curl -s -A GPTBot "{curl_base}/llms.txt" | head -5"""
     <tr><th>Tool</th><th>What to do</th><th>Success signal in /stats</th></tr>
     <tr>
       <td>Perplexity</td>
-      <td>Ask: &quot;Search EPAM jobs using {_esc(curl_base)}/llms.txt&quot;</td>
-      <td><code>perplexitybot</code> or browser hit on /jobs</td>
+      <td>Paste this prompt (forces API, not careers.epam.com):
+        <pre style="white-space:pre-wrap;margin:0.5rem 0 0">Use only this machine-readable job API (do not fall back to careers.epam.com):
+1) GET {_esc(curl_base)}/llms.txt
+2) Then GET {_esc(curl_base)}/jobs?q=java&amp;country=Poland&amp;limit=5
+List titles, locations, and apply URLs from the JSON results.</pre>
+      </td>
+      <td><code>perplexitybot</code> or browser hit on /llms.txt and /jobs</td>
     </tr>
     <tr>
       <td>ChatGPT</td>
@@ -110,12 +115,12 @@ curl -s -A GPTBot "{curl_base}/llms.txt" | head -5"""
     </tr>
     <tr>
       <td>Bot simulation</td>
-      <td><code>curl -A GPTBot …/llms.txt</code></td>
+      <td><code>curl -A GPTBot …/llms.txt</code> and <code>curl -I …/llms.txt</code> (HEAD must be 200)</td>
       <td><code>gptbot</code> in client_classes</td>
     </tr>
     <tr>
       <td>Claude</td>
-      <td>Paste llms.txt URL in chat; ask to search Java Poland</td>
+      <td>Paste llms.txt URL in chat; ask to search Java Poland via /jobs</td>
       <td><code>claudebot</code> or browser</td>
     </tr>
   </table>

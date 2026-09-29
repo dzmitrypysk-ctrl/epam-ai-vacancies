@@ -16,6 +16,7 @@ from typing import Any, Optional
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, JSONResponse, PlainTextResponse
+from starlette.types import ASGIApp, Receive, Scope, Send
 
 from service.analytics import (
     RequestEvent,
@@ -58,6 +59,44 @@ app.add_middleware(
 )
 
 
+class HeadAsGetMiddleware:
+    """Many AI/browser fetchers probe with HEAD first. FastAPI/Starlette
+    often returns 405 for HEAD on GET-only routes; remap HEAD→GET and
+    strip the body so crawlers see 200 instead of treating the URL as dead.
+    """
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] != "http" or scope.get("method") != "HEAD":
+            await self.app(scope, receive, send)
+            return
+
+        scope = dict(scope)
+        scope["method"] = "GET"
+
+        async def send_head(message: dict) -> None:
+            if message["type"] == "http.response.start":
+                headers = [
+                    (k, v)
+                    for k, v in message.get("headers", [])
+                    if k.lower() != b"content-length"
+                ]
+                await send({**message, "headers": headers})
+            elif message["type"] == "http.response.body":
+                # Drop body for HEAD; keep trailers/end signal.
+                if not message.get("more_body", False):
+                    await send({"type": "http.response.body", "body": b""})
+            else:
+                await send(message)
+
+        await self.app(scope, receive, send_head)
+
+
+app.add_middleware(HeadAsGetMiddleware)
+
+
 @app.middleware("http")
 async def analytics_middleware(request: Request, call_next):
     path = request.url.path
@@ -70,11 +109,14 @@ async def analytics_middleware(request: Request, call_next):
 
     ua = request.headers.get("user-agent", "")
     query = request.url.query or ""
+    # After HeadAsGetMiddleware, request.method may be GET for HEAD probes;
+    # prefer the original client method from the ASGI scope when present.
+    method = request.scope.get("method") or request.method
     analytics_store.record(
         RequestEvent(
             ts=time.time(),
             path=path,
-            method=request.method,
+            method=method,
             query=query,
             user_agent=ua,
             referer=request.headers.get("referer", ""),
