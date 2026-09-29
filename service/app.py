@@ -180,7 +180,10 @@ def locations() -> dict[str, Any]:
 def llms_txt() -> str:
     data = _store()
     meta = data["meta"]
-    base = os.environ.get("PUBLIC_BASE_URL", "").rstrip("/")
+    base = (
+        (os.environ.get("PUBLIC_BASE_URL") or "").strip()
+        or (os.environ.get("RENDER_EXTERNAL_URL") or "").strip()
+    ).rstrip("/")
     base_note = f"Public base URL: {base}\n" if base else ""
     lines = [
         "# EPAM Systems — AI-native vacancy index",

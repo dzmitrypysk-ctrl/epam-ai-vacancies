@@ -13,7 +13,12 @@ def _esc(s: str) -> str:
 
 
 def _base_url() -> str:
-    return (os.environ.get("PUBLIC_BASE_URL") or "").rstrip("/")
+    """Prefer explicit PUBLIC_BASE_URL; on Render use RENDER_EXTERNAL_URL."""
+    for key in ("PUBLIC_BASE_URL", "RENDER_EXTERNAL_URL"):
+        val = (os.environ.get(key) or "").strip().rstrip("/")
+        if val:
+            return val
+    return ""
 
 
 def _cf_beacon() -> str:
@@ -27,7 +32,7 @@ def _cf_beacon() -> str:
 
 
 def test_page(meta: dict[str, Any] | None = None) -> str:
-    base = _base_url() or "(set PUBLIC_BASE_URL after deploy)"
+    base = _base_url() or "(public URL not set)"
     job_count = (meta or {}).get("job_count", "?")
     ingested = (meta or {}).get("ingested_at", "?")
 
