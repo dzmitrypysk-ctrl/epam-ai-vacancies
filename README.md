@@ -96,3 +96,12 @@ Source rows = LinkedIn partner feed slots (`partnerJobId` + non-empty `applyUrl`
 
 - Feed mechanics / slot definition: [projects/job-postings-okr/AGENTS.md](../job-postings-okr/AGENTS.md)
 - Live feed URL: `https://vacancies.careers.epam.com/api/feed/linkedin`
+
+## Auto-refresh index
+
+- Local Mac (launchd): [doc-assets/auto-refresh.md](doc-assets/auto-refresh.md)
+- Cursor Cloud Agent / Automation: [doc-assets/cloud-agent-refresh.md](doc-assets/cloud-agent-refresh.md)
+
+```bash
+CLOUD_MODE=1 bash _scripts/refresh_and_push.sh
+```
