@@ -100,13 +100,18 @@ curl -s -A GPTBot "{curl_base}/llms.txt" | head -5"""
     <tr><th>Tool</th><th>What to do</th><th>Success signal in /stats</th></tr>
     <tr>
       <td>Perplexity</td>
-      <td>Paste this prompt (forces API, not careers.epam.com):
-        <pre style="white-space:pre-wrap;margin:0.5rem 0 0">Use only this machine-readable job API (do not fall back to careers.epam.com):
+      <td>
+        <p><strong>If onrender.com fetch fails</strong> (cold start or tool blocks Render), use GitHub raw mirror:</p>
+        <pre style="white-space:pre-wrap;margin:0.5rem 0">Fetch these URLs and list titles, locations, apply URLs:
+1) https://raw.githubusercontent.com/dzmitrypysk-ctrl/epam-ai-vacancies/main/static-mirror/llms.txt
+2) https://raw.githubusercontent.com/dzmitrypysk-ctrl/epam-ai-vacancies/main/static-mirror/jobs-java-poland.json</pre>
+        <p>Live API (warm service first — open {_esc(curl_base)}/health ):</p>
+        <pre style="white-space:pre-wrap;margin:0.5rem 0">Use only this machine-readable job API (do not fall back to careers.epam.com):
 1) GET {_esc(curl_base)}/llms.txt
 2) Then GET {_esc(curl_base)}/jobs?q=java&amp;country=Poland&amp;limit=5
 List titles, locations, and apply URLs from the JSON results.</pre>
       </td>
-      <td><code>perplexitybot</code> or browser hit on /llms.txt and /jobs</td>
+      <td><code>perplexitybot</code> on /llms.txt+/jobs (GitHub raw will not show in /stats)</td>
     </tr>
     <tr>
       <td>ChatGPT</td>

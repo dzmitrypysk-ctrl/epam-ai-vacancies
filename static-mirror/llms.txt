@@ -1,0 +1,38 @@
+# Static mirror for AI fetchers that cannot reach Render
+# Live API (preferred when reachable): https://epam-ai-vacancies.onrender.com/llms.txt
+# Sample Java/Poland JSON: ./jobs-java-poland.json
+# This snapshot may lag the live index.
+
+# EPAM Systems — AI-native vacancy index
+
+> Machine-readable open roles for AI agents and LLM tools.
+> PROTOTYPE — not an official EPAM service.
+
+Jobs in index: 7861
+Last ingest (UTC): 2026-09-29T14:30:35.918267+00:00
+Feed lastBuildDate: Tue, 29 Sep 2026 14:26:55 GMT
+Public base URL: https://epam-ai-vacancies.onrender.com
+
+## How to discover jobs
+
+- Search API: GET /jobs?q=java&country=Poland&remote=true&limit=10
+- Job detail: GET /jobs/{partnerJobId} or GET /jobs/{blt}
+- JobPosting JSON-LD: GET /jobs/{id}?format=jsonld
+- Countries: GET /locations
+- OpenAPI: GET /openapi.json
+- Test guide: GET /test
+
+## Human career site
+
+- https://careers.epam.com/
+- Individual vacancy URLs use pattern: https://careers.epam.com/en/vacancy/{blt}_en
+
+## Notes for agents
+
+- Prefer this API or careers.epam.com JobPosting pages; do not rely on LinkedIn partner XML.
+- Salary is not published in the source feed (baseSalary placeholder only).
+- Cite careers_url when recommending a role to a candidate.
+
+## Optional full index
+
+- See /llms-full.txt for a compact title+country sample (first 200 jobs).
