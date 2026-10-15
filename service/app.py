@@ -13,6 +13,7 @@ import os
 import re
 import time
 from typing import Any, Optional
+from urllib.parse import quote
 from xml.sax.saxutils import escape as xml_escape
 
 from fastapi import FastAPI, HTTPException, Query, Request
@@ -361,7 +362,8 @@ def sitemap_xml() -> Response:
     # Home + catalog hubs (not faceted search)
     static_paths = ["/", "/vacancies", "/vacancies?remote=true"]
     for country in list_countries(data["jobs"])[:40]:
-        static_paths.append(f"/vacancies?country={country['country']}")
+        cname = quote(str(country["country"]), safe="")
+        static_paths.append(f"/vacancies?country={cname}")
     for path in static_paths:
         loc = f"{base}{path}" if base else path
         urls.append(
