@@ -6,10 +6,10 @@
 
 ## Cost & plan gate (2026-10)
 
-- **Subscription:** Cloud Agents / Automations need **Premium (~$30/mo) or higher** (not Free/Plus). Confirm in Cursor Settings → Account.
-- **Billing:** no separate Automation fee — each run uses Cloud Agent usage (included pool first, then on-demand at the model’s API rate). VM build is free.
+- **Subscription:** Cloud Agents / Automations need Premium+ **or Enterprise** (not Free/Plus). **This account: Enterprise (confirmed 2026-10-15)** — no Premium upgrade required.
+- **Billing:** no separate Automation fee — each run uses Cloud Agent usage (Enterprise pooled usage / on-demand). Third-party models may incur Cursor Token Rate. VM build is free.
 - **Estimate for this job** (short prompt + `refresh_and_push.sh`, ~20 weekdays/mo):
-  - cheap / fast model: often ~$0.05–0.50 per run, ~$0–10/mo beyond plan if pool covers most runs;
+  - cheap / fast model: often ~$0.05–0.50 per run or mostly covered by pool;
   - heavy model (Opus / high GPT): easily $1–5+ per run — **do not use** for this bash job.
 - **Primary path stays free:** Mac launchd — see [auto-refresh.md](auto-refresh.md). Use Cloud only when the Mac is often off at 09:00 **and** the smoke below passes.
 - Evidence log: [runs/cloud-automation-cost-2026-10-15.md](../runs/cloud-automation-cost-2026-10-15.md).
@@ -40,7 +40,7 @@ Do not edit `mcp.json`. Do not force-push. Do not amend history.
 ## Manual cloud smoke (required before schedule)
 
 1. Install the **Cursor GitHub App** on `dzmitrypysk-ctrl/epam-ai-vacancies` (vault monorepo alone is not enough).
-2. Confirm plan is Premium+.
+2. Plan gate: **Enterprise confirmed** — OK for Automations.
 3. In Cursor Automations on that repo → **Run now** with the instructions above (cheapest model).
 4. Acceptance for smoke: script exits 0, commit `chore: refresh vacancy index YYYY-MM-DD` on `main`, or a clear feed/network error with **no** corrupt gzip commit.
 5. **Feed note (2026-10-15):** GET of the LinkedIn feed returned valid XML (~47 MB) from the Mac; use GET not HEAD. If Cloud Run now fails on network, **do not** enable daily schedule — keep launchd only.
