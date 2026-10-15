@@ -4,6 +4,20 @@
 **Schedule (intended):** weekdays 09:00 Europe/Minsk  
 **Outcome:** fresh `data/jobs.json.gz` on `main` → Render redeploys if connected.
 
+## Cost & plan gate (2026-10)
+
+- **Subscription:** Cloud Agents / Automations need **Premium (~$30/mo) or higher** (not Free/Plus). Confirm in Cursor Settings → Account.
+- **Billing:** no separate Automation fee — each run uses Cloud Agent usage (included pool first, then on-demand at the model’s API rate). VM build is free.
+- **Estimate for this job** (short prompt + `refresh_and_push.sh`, ~20 weekdays/mo):
+  - cheap / fast model: often ~$0.05–0.50 per run, ~$0–10/mo beyond plan if pool covers most runs;
+  - heavy model (Opus / high GPT): easily $1–5+ per run — **do not use** for this bash job.
+- **Primary path stays free:** Mac launchd — see [auto-refresh.md](auto-refresh.md). Use Cloud only when the Mac is often off at 09:00 **and** the smoke below passes.
+- Evidence log: [runs/cloud-automation-cost-2026-10-15.md](../runs/cloud-automation-cost-2026-10-15.md).
+
+## Model for Automation
+
+Pick the **cheapest capable** Cloud Agent model (Composer / fast tier). Instructions are bash-only; model quality does not improve the feed.
+
 ## Cloud Agent instructions (copy into Automation)
 
 You are refreshing the EPAM AI-native vacancy index. Work only in this repository root.
@@ -23,10 +37,14 @@ Do not edit `mcp.json`. Do not force-push. Do not amend history.
 - [ ] Meta `job_count` > 0 and `ingested_at` is today (UTC)
 - [ ] On feed failure: no corrupt commit; non-zero exit explained in the agent summary
 
-## Manual cloud smoke
+## Manual cloud smoke (required before schedule)
 
-In Cursor Automations → this automation → **Run now**, or start a Cloud Agent on this repo with the instructions above.
+1. Install the **Cursor GitHub App** on `dzmitrypysk-ctrl/epam-ai-vacancies` (vault monorepo alone is not enough).
+2. Confirm plan is Premium+.
+3. In Cursor Automations on that repo → **Run now** with the instructions above (cheapest model).
+4. Acceptance for smoke: script exits 0, commit `chore: refresh vacancy index YYYY-MM-DD` on `main`, or a clear feed/network error with **no** corrupt gzip commit.
+5. **Feed note (2026-10-15):** GET of the LinkedIn feed returned valid XML (~47 MB) from the Mac; use GET not HEAD. If Cloud Run now fails on network, **do not** enable daily schedule — keep launchd only.
 
-## Local fallback
+## Local fallback (keep enabled)
 
-Mac launchd (already installable): see [auto-refresh.md](auto-refresh.md).
+Mac launchd remains the **default / backup** even if Cloud is scheduled: see [auto-refresh.md](auto-refresh.md). Do not uninstall launchd when adding Automation.
