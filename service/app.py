@@ -568,6 +568,17 @@ def robots_txt() -> str:
     return "\n".join(lines)
 
 
+def _indexnow_key() -> str:
+    """Prefer env INDEXNOW_KEY; else data/indexnow.key (committed ownership file)."""
+    expected = (os.environ.get("INDEXNOW_KEY") or "").strip()
+    if expected:
+        return expected
+    key_path = project_root() / "data" / "indexnow.key"
+    if key_path.is_file():
+        return key_path.read_text(encoding="utf-8").strip()
+    return ""
+
+
 @app.get("/{indexnow_key}.txt", response_class=PlainTextResponse)
 def indexnow_key_file(indexnow_key: str) -> str:
     """Host IndexNow ownership key at /{KEY}.txt when INDEXNOW_KEY matches.
@@ -577,7 +588,7 @@ def indexnow_key_file(indexnow_key: str) -> str:
     reserved = {"robots", "llms", "llms-full"}
     if indexnow_key in reserved:
         raise HTTPException(status_code=404, detail="Not found")
-    expected = (os.environ.get("INDEXNOW_KEY") or "").strip()
+    expected = _indexnow_key()
     if not expected or indexnow_key != expected:
         raise HTTPException(status_code=404, detail="Not found")
     return expected
