@@ -2,7 +2,8 @@
 
 **Audience:** Careers platform / VMT / TA job-postings owners  
 **Date:** 2026-08-31  
-**Prototype:** `projects/ai-native-vacancy-service/` (local REST + MCP over LinkedIn XML inventory)
+**Prototype:** `projects/ai-native-vacancy-service/` (independent GEO HTML + REST/MCP over LinkedIn XML inventory)  
+**Public demo:** https://epam-ai-vacancies.onrender.com/
 
 ---
 
@@ -54,28 +55,29 @@ If we want models to **see, rank, and cite** EPAM vacancies, we need:
 
 ---
 
-## Level 2 — AI-native vacancy service (prototype in this repo)
+## Level 2 — Independent GEO + AI-native API (prototype in this repo)
 
 ```text
 LinkedIn XML feed / snapshot
-        → ingest_feed.py
-        → data/jobs.json (normalized slots)
-        → FastAPI /jobs + /llms.txt + OpenAPI
-        → MCP tools: search_vacancies, get_vacancy, list_locations
+        → ingest_feed.py (+ lifecycle added/updated/removed)
+        → data/jobs.json.gz + removed_ids.json
+        → HTML /vacancies/{slug} with JobPosting + sitemap/robots/llms.txt
+        → FastAPI /jobs + OpenAPI + MCP tools
 ```
 
 **What the demo proves**
 
-- Agent can search “Java remote Poland”, “BA Mexico”, “Salesforce Romania” and get **careers URLs** + **JobPosting JSON-LD**.  
-- Same inventory powering LinkedIn slots can power **LLM tools** without scraping LinkedIn.  
-- OpenAPI is ready for a **Custom GPT / ChatGPT Action** once hosted publicly.
+- Crawlable vacancy pages on an **independent host** (not waiting for careers.epam.com `/llms.txt`).  
+- Agent can search “Java remote Poland”, “BA Mexico”, “Salesforce Romania” and get **this-host canonical URLs** + apply links on careers.  
+- OpenAPI is ready for a **Custom GPT / ChatGPT Action**.  
+- Closed roles return **410**; sitemap omits them.
 
 **Prototype limits**
 
-- Local only (127.0.0.1:8977); not production SSO/rate-limits/CDN.  
-- Salary placeholder only (feed has no compensation).  
-- Search is keyword-based (not semantic embeddings) — enough for demo; production should add embeddings / ranking.
-
+- Free-tier host may sleep without keepalive; custom domain recommended for reputation.  
+- No `baseSalary` (feed has none — field omitted, not faked).  
+- Search is keyword-based — enough for demo; production should add embeddings / ranking.  
+- Google/Bing index submission needs owner approval ([index-submission-runbook.md](index-submission-runbook.md)).
 **Production sketch**
 
 | Piece | Owner (suggested) |

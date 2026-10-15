@@ -11,7 +11,12 @@ Two paths keep `data/jobs.json.gz` fresh for Render (`dzmitrypysk-ctrl/epam-ai-v
 
 ## A — Install launchd (once)
 
+launchd often fails with `Operation not permitted` / exit **126** when `ProgramArguments` point into a Cyrillic workspace path. The installer copies an **ASCII-path wrapper** under `~/Library/Application Support/epam-ai-vacancies/` and prefers `$HOME/work/...` when that symlink exists.
+
 ```bash
+# Optional but recommended on macOS with non-ASCII Documents path:
+# ln -s "$HOME/Documents/Моя работа" "$HOME/work"
+
 cd projects/ai-native-vacancy-service
 chmod +x _scripts/refresh_and_push.sh _scripts/install_launchd_refresh.sh
 ./_scripts/install_launchd_refresh.sh
@@ -22,6 +27,8 @@ chmod +x _scripts/refresh_and_push.sh _scripts/install_launchd_refresh.sh
 ```bash
 ./_scripts/refresh_and_push.sh           # ingest + gzip + push deploy repo
 ./_scripts/refresh_and_push.sh --no-push # local only
+# or ASCII wrapper:
+bash "$HOME/Library/Application Support/epam-ai-vacancies/refresh_and_push_wrapper.sh" --no-push
 ```
 
 ### Uninstall
@@ -32,8 +39,8 @@ chmod +x _scripts/refresh_and_push.sh _scripts/install_launchd_refresh.sh
 
 ### Logs
 
-- `runs/refresh-YYYY-MM-DD.log`
-- `runs/launchd-refresh.stdout.log` / `.stderr.log`
+- `runs/refresh-YYYY-MM-DD.log` (when run from project)
+- `~/Library/Logs/epam-ai-vacancies-refresh.stdout.log` / `.stderr.log` (launchd)
 
 ## D — Cursor Cloud Automation
 

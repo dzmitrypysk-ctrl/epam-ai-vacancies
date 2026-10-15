@@ -4,26 +4,51 @@ from __future__ import annotations
 
 import os
 import re
+import sys
 import time
 from collections import Counter, deque
 from dataclasses import asdict, dataclass, field
 from threading import Lock
 from typing import Any
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs
 
 MAX_EVENTS = 2000
 SKIP_PATHS = frozenset({"/health", "/favicon.ico"})
 
+# Search/discovery crawlers vs training crawlers are classified separately
+# so training opt-out does not hide search visibility metrics.
 _BOT_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
-    ("gptbot", re.compile(r"gptbot|chatgpt-user|oai-searchbot", re.I)),
+    ("oai-searchbot", re.compile(r"oai-searchbot", re.I)),
+    ("gptbot", re.compile(r"gptbot", re.I)),
+    ("chatgpt-user", re.compile(r"chatgpt-user", re.I)),
+    ("claude-searchbot", re.compile(r"claude-searchbot", re.I)),
+    ("claude-user", re.compile(r"claude-user", re.I)),
     ("claudebot", re.compile(r"claudebot|anthropic-ai|claude-web", re.I)),
-    ("perplexitybot", re.compile(r"perplexitybot|perplexity-user", re.I)),
-    ("googlebot", re.compile(r"googlebot|google-extended|google-inspectiontool", re.I)),
-    ("bingbot", re.compile(r"bingbot|msnbot", re.I)),
+    ("perplexitybot", re.compile(r"perplexitybot", re.I)),
+    ("perplexity-user", re.compile(r"perplexity-user", re.I)),
+    ("googlebot", re.compile(r"googlebot|google-inspectiontool", re.I)),
+    ("google-extended", re.compile(r"google-extended", re.I)),
+    ("bingbot", re.compile(r"bingbot|msnbot|adidxbot", re.I)),
     ("curl", re.compile(r"^curl/", re.I)),
     ("python", re.compile(r"python-requests|python-urllib|aiohttp|httpx", re.I)),
-    ("smoke", re.compile(r"epam-vacancy-smoke|epam-ai-native", re.I)),
+    ("smoke", re.compile(r"epam-vacancy-smoke|epam-ai-native|cursor-health-check", re.I)),
 ]
+
+_SEARCH_OR_AI_CLASSES = frozenset(
+    {
+        "oai-searchbot",
+        "gptbot",
+        "chatgpt-user",
+        "claude-searchbot",
+        "claude-user",
+        "claudebot",
+        "perplexitybot",
+        "perplexity-user",
+        "googlebot",
+        "google-extended",
+        "bingbot",
+    }
+)
 
 
 def classify_client(user_agent: str) -> str:
@@ -66,6 +91,7 @@ class RequestEvent:
     status_code: int
     duration_ms: float
     search_params: dict[str, str] = field(default_factory=dict)
+    client_ip: str = ""
 
 
 class AnalyticsStore:
@@ -76,6 +102,18 @@ class AnalyticsStore:
     def record(self, event: RequestEvent) -> None:
         with self._lock:
             self._events.append(event)
+        if event.client_class in _SEARCH_OR_AI_CLASSES:
+            # Durable-ish signal: stdout survives process restarts in host logs
+            # (Render logs / launchd). UA alone is not proof of a verified bot.
+            print(
+                f"[crawler-hit] ts={time.strftime('%Y-%m-%dT%H:%M:%SZ', time.gmtime(event.ts))} "
+                f"class={event.client_class} {event.method} {event.path}"
+                f"{('?' + event.query) if event.query else ''} "
+                f"status={event.status_code} ip={event.client_ip or '-'} "
+                f"ua={(event.user_agent or '')[:120]}",
+                file=sys.stdout,
+                flush=True,
+            )
 
     def summary(self) -> dict[str, Any]:
         with self._lock:
@@ -87,15 +125,17 @@ class AnalyticsStore:
                 "client_classes": {},
                 "endpoints": {},
                 "search_queries": [],
+                "crawler_hits": 0,
                 "recent": [],
             }
 
         client_counts = Counter(e.client_class for e in events)
         endpoint_counts = Counter(f"{e.method} {e.path}" for e in events)
+        crawler_hits = sum(1 for e in events if e.client_class in _SEARCH_OR_AI_CLASSES)
 
         search_hits: Counter[str] = Counter()
         for e in events:
-            if e.path != "/jobs" or not e.search_params:
+            if e.path not in ("/jobs", "/vacancies") or not e.search_params:
                 continue
             parts = [f"{k}={v}" for k, v in sorted(e.search_params.items())]
             search_hits["&".join(parts)] += 1
@@ -112,6 +152,7 @@ class AnalyticsStore:
                     "user_agent": (e.user_agent or "")[:100],
                     "status": e.status_code,
                     "duration_ms": round(e.duration_ms, 1),
+                    "client_ip": e.client_ip,
                 }
             )
 
@@ -122,6 +163,7 @@ class AnalyticsStore:
             "search_queries": [
                 {"query": q, "count": c} for q, c in search_hits.most_common(15)
             ],
+            "crawler_hits": crawler_hits,
             "recent": recent,
         }
 

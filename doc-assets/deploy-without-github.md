@@ -22,10 +22,22 @@ Copy the `https://….trycloudflare.com` URL. Then open:
 
 ## Option B — Persistent free (Render + personal GitHub)
 
-1. Fork/copy `projects/ai-native-vacancy-service` to **your personal** GitHub repo (not codemie-local).
-2. [render.com](https://render.com) → Sign in with **personal** GitHub → New Web Service.
-3. Root dir: `projects/ai-native-vacancy-service` (or repo root if standalone).
-4. Env: `PUBLIC_BASE_URL`, optional `STATS_TOKEN`, `CF_ANALYTICS_TOKEN`.
+**Prep (already runnable):**
+
+```bash
+bash projects/ai-native-vacancy-service/_scripts/prepare_standalone_git_repo.sh
+# → ~/epam-ai-vacancies-deploy (git repo with jobs.json.gz, render.yaml at root)
+```
+
+1. Create empty **public** repo on **your personal** GitHub: `epam-ai-vacancies` (not `codemie-local`).
+2. Push:
+   ```bash
+   cd ~/epam-ai-vacancies-deploy
+   git remote add origin https://github.com/YOUR_USER/epam-ai-vacancies.git
+   git push -u origin main
+   ```
+3. [render.com](https://render.com) → Sign in with same GitHub → **New** → **Blueprint** (or Web Service) → that repo.
+4. Env after first URL is known: `PUBLIC_BASE_URL=https://….onrender.com`, optional `STATS_TOKEN`, `CF_ANALYTICS_TOKEN`.
 5. See [deploy-runbook.md](deploy-runbook.md).
 
 ## Option C — Hugging Face Spaces (Docker, free)

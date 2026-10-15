@@ -62,9 +62,16 @@ fi
 "$PY" "$ROOT/_scripts/build_gzip_store.py"
 
 GZ="$ROOT/data/jobs.json.gz"
+REMOVED="$ROOT/data/removed_ids.json"
+LIFECYCLE="$ROOT/data/lifecycle-latest.json"
 if [[ ! -f "$GZ" ]]; then
   echo "ERROR: gzip missing after build: $GZ" >&2
   exit 3
+fi
+
+# Optional IndexNow notify (no-op unless INDEXNOW_KEY set)
+if [[ -f "$LIFECYCLE" ]]; then
+  "$PY" "$ROOT/_scripts/notify_indexnow.py" --lifecycle "$LIFECYCLE" || true
 fi
 
 if [[ "$NO_PUSH" -eq 1 ]]; then
@@ -82,6 +89,8 @@ fi
 if [[ "$DEPLOY_REPO" != "$ROOT" ]]; then
   mkdir -p "$DEPLOY_REPO/data"
   cp -f "$GZ" "$DEPLOY_REPO/data/jobs.json.gz"
+  [[ -f "$REMOVED" ]] && cp -f "$REMOVED" "$DEPLOY_REPO/data/removed_ids.json"
+  [[ -f "$LIFECYCLE" ]] && cp -f "$LIFECYCLE" "$DEPLOY_REPO/data/lifecycle-latest.json"
 fi
 
 cd "$DEPLOY_REPO"
@@ -90,6 +99,8 @@ if command -v gh >/dev/null 2>&1; then
 fi
 
 git add data/jobs.json.gz
+[[ -f data/removed_ids.json ]] && git add data/removed_ids.json
+[[ -f data/lifecycle-latest.json ]] && git add data/lifecycle-latest.json
 # Include today's refresh log when present in this repo
 if [[ -f "$ROOT/runs/refresh-$(date -u +%Y-%m-%d).log" ]] && [[ "$DEPLOY_REPO" == "$ROOT" ]]; then
   mkdir -p runs
