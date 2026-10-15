@@ -8,6 +8,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY service/ service/
 COPY mcp_server/ mcp_server/
 COPY data/jobs.json.gz data/jobs.json.gz
+COPY data/indexnow.key data/indexnow.key
+COPY data/removed_ids.json data/removed_ids.json
 
 ENV HOST=0.0.0.0
 ENV PORT=8977
