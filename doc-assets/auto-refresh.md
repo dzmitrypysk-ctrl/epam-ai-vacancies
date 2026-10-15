@@ -5,7 +5,7 @@ Two paths keep `data/jobs.json.gz` fresh for Render (`dzmitrypysk-ctrl/epam-ai-v
 | Path | When | Where | Cost |
 |------|------|--------|------|
 | **A — launchd (Mac)** — **primary** | Weekdays 09:00 local | This laptop | **$0/run** (already installable) |
-| **D — Cursor Automation** — optional | Weekdays 09:00 Europe/Minsk | Cloud Agent on GitHub repo | Premium+ plan + Cloud Agent usage; cheap model only — see [cloud-agent-refresh.md](cloud-agent-refresh.md) |
+| **D — Cursor Automation** — optional | Weekdays 09:00 Europe/Minsk | Cloud Agent on GitHub repo | Enterprise (confirmed) / Premium+ + usage; cheap model only — see [cloud-agent-refresh.md](cloud-agent-refresh.md) |
 
 **Requires for fetch:** LinkedIn feed reachable via GET (public XML observed 2026-10-15 from Mac; Cloud still needs its own smoke). **Keep launchd as backup** even if Automation is enabled. Cost/smoke log: [runs/cloud-automation-cost-2026-10-15.md](../runs/cloud-automation-cost-2026-10-15.md).
 
