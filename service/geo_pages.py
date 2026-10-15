@@ -28,6 +28,17 @@ def _cf_beacon() -> str:
 """
 
 
+def _gsc_meta() -> str:
+    """Google Search Console HTML-tag verification (optional env or baked token)."""
+    token = (
+        os.environ.get("GSC_SITE_VERIFICATION")
+        or "dyt89qjedhQyQ3WxAFQlPt5JTQfILWoehhHikgCZEdI"
+    ).strip()
+    if not token:
+        return ""
+    return f'<meta name="google-site-verification" content="{_esc(token)}">'
+
+
 _CSS = """
   :root { --fg:#1a1a1a; --muted:#555; --border:#ddd; --accent:#039; --bg:#fafafa; }
   body { font-family: system-ui, -apple-system, sans-serif; color: var(--fg);
@@ -89,6 +100,7 @@ def _shell(
   <title>{_esc(title)}</title>
   <meta name="description" content="{_esc(desc)}">
   <meta name="robots" content="{_esc(robots)}">
+  {_gsc_meta()}
   {canon}
   <style>{_CSS}</style>
   {ld}

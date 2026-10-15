@@ -10,6 +10,7 @@ Production (Render):
 from __future__ import annotations
 
 import os
+import re
 import time
 from typing import Any, Optional
 from xml.sax.saxutils import escape as xml_escape
@@ -577,6 +578,18 @@ def _indexnow_key() -> str:
     if key_path.is_file():
         return key_path.read_text(encoding="utf-8").strip()
     return ""
+
+
+@app.get("/google{token}.html", response_class=PlainTextResponse)
+def gsc_html_verification(token: str) -> str:
+    """Serve Google Search Console HTML-file verification at /google*.html."""
+    name = f"google{token}.html"
+    if not re.fullmatch(r"[a-zA-Z0-9]+\.html", name):
+        raise HTTPException(status_code=404, detail="Not found")
+    path = project_root() / "data" / name
+    if not path.is_file():
+        raise HTTPException(status_code=404, detail="Not found")
+    return path.read_text(encoding="utf-8").strip() + "\n"
 
 
 @app.get("/{indexnow_key}.txt", response_class=PlainTextResponse)
