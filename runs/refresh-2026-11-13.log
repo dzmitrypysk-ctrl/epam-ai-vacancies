@@ -1,0 +1,13 @@
+=== refresh start 2026-11-13T08:01:26Z ===
+ROOT=/agent
+CLOUD_MODE=1
+DEPLOY_REPO=/agent
+Wrote 8531 jobs → /agent/data/jobs.json
+Source: https://vacancies.careers.epam.com/api/feed/linkedin
+Lifecycle: +13 ~992 -0 → /agent/data/lifecycle-latest.json
+Removed ids for 410: /agent/data/removed_ids.json
+Top countries: India=1531, Ukraine=558, Mexico=545, Poland=526, Colombia=470, Argentina=433, Kazakhstan=323, Georgia=310
+Wrote /agent/data/jobs.json.gz
+Jobs: 8531
+Size: 74.9 MB raw -> 7.6 MB gzip (90% smaller)
+IndexNow skipped: PUBLIC_BASE_URL / RENDER_EXTERNAL_URL not set
